@@ -1,1030 +1,382 @@
-<!-- RASKOL 17 // MIL-TECH FUTURE UI (NO JAVASCRIPT) -->
-<div class="r17-shell">
+```react
+import React, { useState, useEffect } from 'react';
+import { ShieldAlert, Crosshair, FileText, Skull, Lock, ChevronRight, Fingerprint, Activity, Radio, Map } from 'lucide-react';
 
-  <!-- Ambient layers -->
-  <div class="r17-bg">
-    <div class="r17-scanlines"></div>
-    <div class="r17-grid"></div>
-    <div class="r17-noise"></div>
-    <div class="r17-radar"></div>
-  </div>
+// --- Reusable Components ---
 
-  <!-- Header / Hero -->
-  <header class="r17-hero">
-    <div class="r17-hero__top">
-      <div class="r17-badge">
-        <span class="dot"></span>
-        <span>SECURE LINK • MILNET</span>
-      </div>
+const Redacted = ({ children }) => (
+  <span className="bg-zinc-800 text-zinc-800 hover:text-red-500 hover:bg-transparent transition-all duration-300 cursor-crosshair px-1 select-none font-mono font-bold tracking-widest border border-transparent hover:border-red-500/30">
+    {children}
+  </span>
+);
 
-      <div class="r17-hero__id">
-        <div class="sig">R17</div>
-        <div class="meta">
-          <div class="meta-line">STRIPBREACH // <span class="glitch">█████ CLASSIFIED █████</span></div>
-          <div class="meta-sub">FUTURE-WAR INTEL NODE • BOT DEPLOYMENT HUB • FICTIONAL UNIVERSE</div>
-        </div>
-      </div>
-
-      <div class="r17-kpi">
-        <div class="kpi">
-          <div class="k">THREAT</div>
-          <div class="v">ELEVATED</div>
-        </div>
-        <div class="kpi">
-          <div class="k">UPTIME</div>
-          <div class="v">99.7%</div>
-        </div>
-        <div class="kpi">
-          <div class="k">CLEARANCE</div>
-          <div class="v">OMEGA</div>
-        </div>
-      </div>
+const GlitchText = ({ text }) => {
+  return (
+    <div className="relative inline-block group">
+      <span className="relative z-10">{text}</span>
+      <span className="absolute top-0 left-0 -ml-[1px] text-red-500 opacity-0 group-hover:opacity-70 group-hover:animate-pulse z-0 mix-blend-screen">{text}</span>
+      <span className="absolute top-0 left-0 ml-[1px] text-blue-500 opacity-0 group-hover:opacity-70 group-hover:animate-pulse z-0 mix-blend-screen delay-75">{text}</span>
     </div>
+  );
+};
 
-    <div class="r17-hero__cta">
-      <a class="r17-cta" href="https://raskol17.fandom.com/wiki/RASKOL_17_Wiki" rel="noopener noreferrer">
-        <span class="ico">🌏</span><span>RASKOL 17 Wiki / Official Website</span><span class="arr">→</span>
-      </a>
-      <a class="r17-cta" href="https://janitorai.com/search?mode=all&amp;sort=popular&amp;custom_tags=raskol17&amp;page=1" rel="noopener noreferrer">
-        <span class="ico">🩸</span><span>View All RASKOL 17 Bots on Janitor</span><span class="arr">→</span>
-      </a>
-      <a class="r17-cta" href="https://saeliyos.itch.io/raskol17" rel="noopener noreferrer">
-        <span class="ico">📖</span><span>Read the Novel (so far)</span><span class="arr">→</span>
-      </a>
-    </div>
-  </header>
+// --- Main Application ---
 
-  <!-- Main grid -->
-  <section class="r17-gridwrap">
+export default function App() {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [bootSequence, setBootSequence] = useState(true);
 
-    <!-- Intel Panel: Character Spotlight -->
-    <article class="r17-panel r17-panel--spotlight">
-      <div class="r17-panel__hdr">
-        <h3>Character Spotlight</h3>
-        <div class="r17-chip">LIVE FEED</div>
+  // Simulate a boot-up terminal sequence
+  useEffect(() => {
+    const timer = setTimeout(() => setBootSequence(false), 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (bootSequence) {
+    return (
+      <div className="min-h-screen bg-black text-green-500 font-mono p-6 flex flex-col justify-center items-start overflow-hidden">
+        <div className="max-w-2xl mx-auto space-y-2">
+          <p className="animate-pulse">{'>'} INITIALIZING SECURE CONNECTION...</p>
+          <p className="opacity-0 animate-[fadeIn_0.5s_ease-in-out_0.5s_forwards]">{'>'} BYPASSING GRU FIREWALLS...</p>
+          <p className="opacity-0 animate-[fadeIn_0.5s_ease-in-out_1s_forwards]">{'>'} DECRYPTING DIRECTIVE NO. 17...</p>
+          <p className="opacity-0 animate-[fadeIn_0.5s_ease-in-out_1.5s_forwards] text-red-500">{'>'} WARNING: BLACK SEAL ZERKALO CLEARANCE REQUIRED.</p>
+          <p className="opacity-0 animate-[fadeIn_0.5s_ease-in-out_2s_forwards]">{'>'} ACCESS GRANTED.</p>
+        </div>
       </div>
+    );
+  }
 
-      <div class="r17-spotlight">
-        <div class="r17-portrait">
-          <div class="r17-portrait__frame">
-            <img src="https://ella.janitorai.com/media-approved/kJpWh_oXDQBIjfq4gDBAc.jpg" alt="IVAN SHEVCHENKO" />
-            <div class="r17-portrait__hud">
-              <div class="hud-line"><span>SUBJECT</span><b>IVAN SHEVCHENKO</b></div>
-              <div class="hud-line"><span>STATUS</span><b>STABLE / UNBROKEN</b></div>
-              <div class="hud-line"><span>SIGNAL</span><b>LOCKED</b></div>
+  return (
+    <div className="min-h-screen bg-zinc-950 text-zinc-300 font-sans selection:bg-red-900 selection:text-white relative">
+      {/* CRT Scanline Overlay */}
+      <div className="pointer-events-none fixed inset-0 z-50 opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]"></div>
+
+      {/* Header Navigation */}
+      <header className="border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center py-4 gap-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-red-900 flex items-center justify-center border border-red-700">
+                <Skull className="text-zinc-100" size={24} />
+              </div>
+              <div>
+                <h1 className="text-2xl font-black tracking-tighter text-zinc-100 leading-none">
+                  <GlitchText text="RASKOL 17" />
+                </h1>
+                <p className="text-red-600 text-xs font-mono font-bold tracking-widest uppercase">СОВЕРШЕННО СЕКРЕТНО</p>
+              </div>
+            </div>
+
+            <nav className="flex space-x-1 bg-zinc-900 p-1 rounded-sm border border-zinc-800">
+              {['overview', 'dossiers', 'operations'].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-1.5 text-xs font-mono uppercase tracking-wider transition-colors ${
+                    activeTab === tab
+                      ? 'bg-red-900/40 text-red-400 border border-red-900/50'
+                      : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {activeTab === 'overview' && <OverviewSection />}
+        {activeTab === 'dossiers' && <DossiersSection />}
+        {activeTab === 'operations' && <OperationsSection />}
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-zinc-900 bg-black py-8 mt-12">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <Lock className="mx-auto text-zinc-700 mb-4" size={20} />
+          <p className="text-zinc-600 text-xs font-mono max-w-2xl mx-auto uppercase">
+            The Russian Federation categorically denies the existence of RASKOL 17. All operatives hold Black Seal "ZERKALO" status. 
+            If captured or killed, they will be disavowed as foreign mercenaries. Loyalty is not to orders. Loyalty is not to medals. 
+            Loyalty is to the fracture that protects the core.
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+// --- Sections ---
+
+function OverviewSection() {
+  return (
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* Hero */}
+      <div className="relative border border-zinc-800 bg-zinc-900/50 p-6 sm:p-10 overflow-hidden">
+        <div className="absolute top-0 right-0 p-4 opacity-10">
+          <ShieldAlert size={120} />
+        </div>
+        <div className="relative z-10 max-w-3xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-950/50 border border-red-900/50 text-red-500 text-xs font-mono mb-6">
+            <Radio size={14} className="animate-pulse" />
+            <span>OPERATIONAL STATUS: BLACK SEAL CLEARANCE</span>
+          </div>
+          <h2 className="text-4xl sm:text-5xl font-black text-zinc-100 uppercase tracking-tighter mb-6">
+            A controlled break from convention.
+          </h2>
+          <p className="text-lg text-zinc-400 mb-4 leading-relaxed">
+            In Russian, <span className="text-zinc-200 font-bold">“раскол” (Raskol)</span> means schism, split, or fracture. 
+            Historically referencing violent ideological separation, Col. Rolan Varkoff chose the name deliberately. 
+            RASKOL 17 does not represent betrayal. It represents a fracture made to protect the state from threats it cannot officially address.
+          </p>
+          <div className="flex gap-4 mt-8">
+            <div className="bg-black/50 border border-zinc-800 p-4 flex-1">
+              <h4 className="text-zinc-500 text-xs font-mono uppercase mb-1">Formed</h4>
+              <p className="text-zinc-200 font-medium">2014 (Post-Crimea)</p>
+            </div>
+            <div className="bg-black/50 border border-zinc-800 p-4 flex-1">
+              <h4 className="text-zinc-500 text-xs font-mono uppercase mb-1">Origin</h4>
+              <p className="text-zinc-200 font-medium">Directive No. 17</p>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="r17-dossier">
-          <div class="r17-dossier__tag">DOSSIER NOTE</div>
-          <p>
-            Ivan Shevchenko is the only “good boy” in RASKOL 17 — at least for now. His heart remains unblemished,
-            steady and true despite the fractures grief has carved into him.
-          </p>
-          <p>
-            The others? A different matter entirely. Questionable at best, restless at worst.
-          </p>
-          <p class="r17-emph">
-            But Ivan? He is, and always will be, the good boy who’s anything but innocent.
-          </p>
+      {/* Origin Story */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+          <h3 className="text-2xl font-bold text-zinc-100 flex items-center gap-3 border-b border-zinc-800 pb-2">
+            <Activity className="text-red-500" /> DIRECTIVE NO. 17
+          </h3>
+          <div className="space-y-4 text-zinc-400 font-serif leading-relaxed">
+            <p>
+              Following the 2014 annexation of Crimea, GRU high command faced mounting unconventional threats: NATO-backed special forces, Western proxies, and internal destabilization cells. Conventional protocol was too slow and too visible.
+            </p>
+            <p>
+              Varkoff submitted an unorthodox proposal: create a small detachment with no paper trail, no uniforms, and no oversight. A unit not bound by treaties or official existence. It was officially rejected. Three weeks later, Varkoff and four operatives vanished from all military records.
+            </p>
+            <p>
+              They resurfaced months later operating under black directive. The "17" refers to a classified Kremlin memorandum authorizing a deniable unit capable of total autonomy. One physical copy was hand-delivered. It was not filed. But it was acted upon.
+            </p>
+          </div>
+        </div>
 
-          <div class="r17-minirow">
-            <a class="r17-mini" href="https://raskol17.fandom.com/wiki/Rolan_Varkoff" rel="noopener noreferrer">Rolan Varkoff Bio ▷</a>
-            <a class="r17-mini" href="https://raskol17.fandom.com/wiki/Lev_Svyatoslav" rel="noopener noreferrer">Lev Svyatoslav Bio ▷</a>
-            <a class="r17-mini" href="https://raskol17.fandom.com/wiki/Dimitri_Rustov" rel="noopener noreferrer">Dimitri Rustov Bio ▷</a>
-            <a class="r17-mini" href="https://raskol17.fandom.com/wiki/Konstantin_Yegorov" rel="noopener noreferrer">Konstantin Yegorov Bio ▷</a>
-            <a class="r17-mini" href="https://raskol17.fandom.com/wiki/Ivan_Shevchenko" rel="noopener noreferrer">Ivan Shevchenko Bio ▷</a>
-            <a class="r17-mini r17-mini--hot" href="https://raskol17.fandom.com/wiki/ALL_CHARACTERS" rel="noopener noreferrer">ALL R17 Characters ▷</a>
-            <a class="r17-mini r17-mini--hot" href="https://raskol17.fandom.com/wiki/Factions" rel="noopener noreferrer"><b>All Groups &amp; Factions ▷</b></a>
+        {/* Quick Facts Sidebar */}
+        <div className="space-y-6">
+          <div className="bg-zinc-900 border border-zinc-800 p-5">
+            <h4 className="text-sm font-mono text-zinc-100 uppercase mb-4 flex items-center gap-2">
+              <Crosshair size={16} className="text-red-500" /> Modus Operandi
+            </h4>
+            <ul className="space-y-3 text-sm text-zinc-400 font-mono">
+              <li className="flex items-start gap-2">
+                <ChevronRight size={16} className="text-zinc-600 shrink-0 mt-0.5" />
+                Eliminate Western-backed saboteurs on Russian soil.
+              </li>
+              <li className="flex items-start gap-2">
+                <ChevronRight size={16} className="text-zinc-600 shrink-0 mt-0.5" />
+                Dismantle arms trafficking pipelines.
+              </li>
+              <li className="flex items-start gap-2">
+                <ChevronRight size={16} className="text-zinc-600 shrink-0 mt-0.5" />
+                Extract or execute internal traitors.
+              </li>
+              <li className="flex items-start gap-2">
+                <ChevronRight size={16} className="text-zinc-600 shrink-0 mt-0.5" />
+                Operate without attribution (accidents, missing persons).
+              </li>
+            </ul>
           </div>
         </div>
       </div>
-    </article>
-
-    <!-- Intel Panel: Quick Links -->
-    <article class="r17-panel">
-      <div class="r17-panel__hdr">
-        <h3>Deployment Links</h3>
-        <div class="r17-chip r17-chip--amber">FAST ACCESS</div>
-      </div>
-
-      <div class="r17-btngrid">
-        <a class="r17-btn" href="https://janitorai.com/search?mode=all&amp;sort=popular&amp;custom_tags=raskol17&amp;page=1" rel="noopener noreferrer">
-          <span class="bico">🟢</span><span>All RASKOL 17 Bots</span><span class="arr">→</span>
-        </a>
-        <a class="r17-btn" href="https://ko-fi.com/6ael/tip" rel="noopener noreferrer">
-          <span class="bico">☕</span><span>Ko-Fi</span><span class="arr">→</span>
-        </a>
-        <a class="r17-btn" href="https://janitorai.com/profiles/51fbdd7e-3bd5-48b7-9fe4-2af170b38b4d_profile-of-6-ael" rel="noopener noreferrer">
-          <span class="bico">🧬</span><span>Alt Account @6ael</span><span class="arr">→</span>
-        </a>
-        <a class="r17-btn" href="https://discord.gg/A49B5AgXTq" rel="noopener noreferrer">
-          <span class="bico">📡</span><span>Discord Server</span><span class="arr">→</span>
-        </a>
-      </div>
-
-      <div class="r17-banner">
-        <a class="r17-banner__a" href="https://janitorai.com/search?mode=all&amp;sort=popular&amp;custom_tags=raskol17&amp;page=1" rel="noopener noreferrer">
-          <span class="pulse"></span>
-          <span class="txt">VIEW ALL RASKOL 17 BOTS ON J.AI</span>
-          <span class="tag">#raskol17</span>
-          <span class="arr">→</span>
-        </a>
-      </div>
-
-      <details class="r17-details">
-        <summary>Operational Readout</summary>
-        <div class="r17-details__content">
-          <ul class="r17-list">
-            <li><b>Theme:</b> military tech / future noir</li>
-            <li><b>UI:</b> scanlines, holographic borders, radar pulse, glitch typography</li>
-            <li><b>Platform-safe:</b> CSS-only, no scripts</li>
-          </ul>
-        </div>
-      </details>
-    </article>
-
-  </section>
-
-  <footer class="r17-footer">
-    <span class="r17-footer__l">RASKOL 17</span>
-    <span class="r17-footer__m">•</span>
-    <span class="r17-footer__r">SIGNAL ENCRYPTED • VISUAL SYSTEM ONLINE</span>
-  </footer>
-</div>
-
-<style>
-/* =========================================================
-   R17 MIL-TECH FUTURE UI — CSS ONLY
-   - Includes upgraded "bot card" effects for platform classes
-   - Matches page + cards + buttons + details + hover FX
-   ========================================================= */
-
-/* ---------- Core tokens ---------- */
-:root{
-  --bg0:#05070a;
-  --bg1:#070b10;
-  --bg2:#0b1220;
-  --ink:#d7f3ff;
-  --muted:#93b6c6;
-
-  --cyan:#57fff1;
-  --cyan2:#2ee6ff;
-  --lime:#a6ff3b;
-  --amber:#ffcc66;
-  --red:#ff4f72;
-
-  --glass: rgba(10,18,28,.55);
-  --glass2: rgba(7,12,18,.35);
-  --line: rgba(87,255,241,.22);
-  --line2: rgba(166,255,59,.18);
-
-  --shadow: 0 18px 50px rgba(0,0,0,.55);
-  --shadow2: 0 10px 28px rgba(0,0,0,.45);
-
-  --radius: 14px;
-  --radius2: 10px;
-}
-
-*{ box-sizing:border-box; }
-
-.r17-shell{
-  position: relative;
-  margin: 0 auto;
-  padding: clamp(16px, 2.8vw, 28px);
-  max-width: 1100px;
-  color: var(--ink);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
-  letter-spacing: .2px;
-}
-
-/* ---------- Background ambience ---------- */
-.r17-bg{
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(1200px 800px at 20% 15%, rgba(46,230,255,.12), transparent 60%),
-    radial-gradient(900px 700px at 80% 25%, rgba(166,255,59,.10), transparent 58%),
-    radial-gradient(900px 900px at 50% 110%, rgba(255,204,102,.08), transparent 60%),
-    linear-gradient(180deg, var(--bg0), var(--bg2));
-  overflow: hidden;
-}
-
-.r17-grid{
-  position:absolute; inset:-2px;
-  background:
-    linear-gradient(to right, rgba(87,255,241,.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(87,255,241,.06) 1px, transparent 1px);
-  background-size: 46px 46px;
-  mask-image: radial-gradient(60% 55% at 50% 35%, #000 60%, transparent 100%);
-  opacity: .55;
-  animation: r17GridDrift 18s linear infinite;
-}
-@keyframes r17GridDrift{
-  0%{ transform: translate3d(0,0,0) skewY(-2deg); }
-  100%{ transform: translate3d(-46px, 46px, 0) skewY(-2deg); }
-}
-
-.r17-scanlines{
-  position:absolute; inset:0;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(255,255,255,.06) 0px,
-    rgba(255,255,255,.06) 1px,
-    transparent 2px,
-    transparent 6px
+    </div>
   );
-  opacity: .10;
-  mix-blend-mode: overlay;
-  animation: r17Scan 8s linear infinite;
-}
-@keyframes r17Scan{
-  0%{ transform: translateY(0); }
-  100%{ transform: translateY(12px); }
 }
 
-.r17-noise{
-  position:absolute; inset:-20%;
-  background:
-    radial-gradient(circle at 20% 30%, rgba(255,255,255,.08), transparent 28%),
-    radial-gradient(circle at 70% 60%, rgba(255,255,255,.06), transparent 30%),
-    radial-gradient(circle at 45% 80%, rgba(255,255,255,.05), transparent 26%);
-  opacity: .10;
-  filter: blur(1px);
-  animation: r17Noise 7s steps(7) infinite;
-}
-@keyframes r17Noise{
-  0%{ transform: translate(0,0) }
-  15%{ transform: translate(-1%,1%) }
-  35%{ transform: translate(2%,-1%) }
-  55%{ transform: translate(-2%,-2%) }
-  75%{ transform: translate(1%,2%) }
-  100%{ transform: translate(0,0) }
+function DossiersSection() {
+  const operatives = [
+    {
+      name: "Rolan Varkoff",
+      rank: "Colonel",
+      role: "Commander",
+      stats: { height: "213 cm (7'0\")", weight: "124.7 kg", status: "Active" },
+      desc: "Founder of RASKOL 17. Bears significant facial surgical scars and partial paralysis, usually concealed beneath a balaclava even off-duty. Mesomorphic build, 8-10% body fat. Commands with absolute, lethal authority.",
+      quote: "If violence is required, he will provide it."
+    },
+    {
+      name: "Konstantin Yegorov",
+      rank: "Captain",
+      role: "Psychological Warfare / Sniper",
+      stats: { height: "188 cm", age: "32", status: "Active" },
+      desc: "Callsign 'Kostya'. Highly cerebral, provocative, and volatile mastermind of psy-ops. Recruited at 17 after a stint as a petty dealer. Uses deception, radio jammers, and sonic emitters to break enemy will before engaging.",
+      quote: "Obeys orders only when it suits his vision—it usually works."
+    },
+    {
+      name: "Ivan Shevchenko",
+      rank: "Sergeant",
+      role: "Aerial Acrobat / Stealth Entry",
+      stats: { height: "185 cm", age: "27", status: "Active" },
+      desc: "Callsign 'Vanya'. Raised by a mother who trained him in aerial silks and hoop, transforming him into a lethal vertical combatant. Strikes silently from above. Known as the only 'good boy' in the unit despite his lethal precision.",
+      quote: "Silent, precise, and deadly from above."
+    },
+    {
+      name: "Dimitri Rustov",
+      rank: "Lieutenant",
+      role: "Assault / Demolitions",
+      stats: { status: "Active", clearance: "ZERKALO" },
+      desc: "Grew up alongside Konstantin, shares a bitter rivalry. Possesses a discreet but explosive temper that Konstantin constantly tests. Arrested for stealing before being absorbed into the black-ops pipeline.",
+      quote: "[REDACTED BY COMMAND]"
+    },
+    {
+      name: "Lev Svyatoslav",
+      rank: "Major",
+      role: "Spetsnaz Officer / Second-in-Command",
+      stats: { status: "Active", clearance: "ZERKALO" },
+      desc: "Original Spetsnaz operative who worked alongside Varkoff during the early pre-Raskol black-ops missions. Instrumental in the initial recruitment pipeline, hauling recruits from temporary holding cells into the shadow unit.",
+      quote: "The bedrock of the fracture."
+    }
+  ];
+
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="border-b border-zinc-800 pb-4 mb-8">
+        <h2 className="text-3xl font-black text-zinc-100 uppercase tracking-tight flex items-center gap-3">
+          <Fingerprint className="text-red-500" size={32} />
+          Personnel Dossiers
+        </h2>
+        <p className="text-zinc-500 font-mono mt-2">All files classified. Digital footprints erased post-2014.</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {operatives.map((op, idx) => (
+          <div key={idx} className="bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors group relative overflow-hidden flex flex-col">
+            {/* Top Red Bar */}
+            <div className="h-1 w-full bg-zinc-800 group-hover:bg-red-800 transition-colors"></div>
+            
+            <div className="p-6 flex-1 flex flex-col">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-xl font-bold text-zinc-100 uppercase">{op.name}</h3>
+                  <p className="text-red-500 text-sm font-mono font-semibold">{op.rank} // {op.role}</p>
+                </div>
+                <Skull size={20} className="text-zinc-700 group-hover:text-red-900 transition-colors" />
+              </div>
+
+              <div className="flex gap-4 mb-4 pb-4 border-b border-zinc-800/50 text-xs font-mono text-zinc-400">
+                {Object.entries(op.stats).map(([k, v]) => (
+                  <div key={k}>
+                    <span className="uppercase text-zinc-600 block">{k}</span>
+                    <span className="text-zinc-300">{v}</span>
+                  </div>
+                ))}
+              </div>
+
+              <p className="text-sm text-zinc-400 leading-relaxed mb-4 flex-1">
+                {op.desc}
+              </p>
+
+              <blockquote className="border-l-2 border-red-900 pl-3 py-1 bg-zinc-950/50 text-zinc-500 text-sm italic">
+                "{op.quote}"
+              </blockquote>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
-.r17-radar{
-  position:absolute;
-  width: 820px; height: 820px;
-  left: 50%; top: 30%;
-  transform: translate(-50%,-50%);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, rgba(87,255,241,.16) 0%, transparent 55%),
-    conic-gradient(from 0deg, rgba(46,230,255,.0), rgba(46,230,255,.18), rgba(46,230,255,.0));
-  filter: blur(.2px);
-  opacity: .45;
-  animation: r17Radar 7s linear infinite;
-  pointer-events:none;
-}
-@keyframes r17Radar{
-  0%{ transform: translate(-50%,-50%) rotate(0deg); }
-  100%{ transform: translate(-50%,-50%) rotate(360deg); }
+function OperationsSection() {
+  return (
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="border-b border-zinc-800 pb-4 mb-8 flex justify-between items-end">
+        <div>
+          <h2 className="text-3xl font-black text-zinc-100 uppercase tracking-tight flex items-center gap-3">
+            <Map className="text-red-500" size={32} />
+            Active Intel
+          </h2>
+          <p className="text-zinc-500 font-mono mt-2">Current Deployments and Target Parameters</p>
+        </div>
+        <div className="text-right hidden sm:block">
+          <span className="inline-block px-2 py-1 bg-red-900/20 text-red-500 text-xs font-mono font-bold border border-red-900/50">
+            ENCRYPTION: ACTIVE
+          </span>
+        </div>
+      </div>
+
+      <div className="bg-zinc-900 border border-zinc-800 p-6 md:p-8 relative overflow-hidden">
+        {/* Background Graphic */}
+        <div className="absolute -right-20 -bottom-20 opacity-5 pointer-events-none">
+          <Crosshair size={400} />
+        </div>
+
+        <div className="relative z-10 max-w-4xl">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-3 w-3 bg-red-500 animate-pulse rounded-full shadow-[0_0_10px_rgba(239,68,68,0.7)]"></div>
+            <h3 className="text-2xl font-black text-zinc-100 uppercase tracking-widest">
+              OPERATION: SLED-GLASS
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div className="space-y-4 md:col-span-2">
+              <div className="bg-black/40 p-4 border-l-4 border-red-800">
+                <h4 className="text-zinc-500 text-xs font-mono uppercase mb-2">Primary Target</h4>
+                <p className="text-xl font-bold text-zinc-200">VIPER 6 Leadership</p>
+                <p className="text-zinc-400 text-sm mt-2">
+                  Objective: Track, isolate, and eliminate VIPER 6 leadership. Disrupt operations without attribution. 
+                  <Redacted> Leave no living source of information.</Redacted>
+                </p>
+              </div>
+
+              <div className="space-y-2 mt-6">
+                <h4 className="text-zinc-500 text-xs font-mono uppercase">Confirmed R17 Activities (Attributed to Accidents)</h4>
+                <ul className="list-disc pl-5 text-sm text-zinc-400 space-y-1">
+                  <li>Five assassinations of compromised Russian state figures.</li>
+                  <li>Armed destabilization of Federation-friendly regions.</li>
+                  <li>Coordinated sabotage of military logistics in the Caucasus.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="bg-zinc-950 p-4 border border-zinc-800 text-sm font-mono space-y-4">
+              <div>
+                <span className="text-zinc-600 block mb-1">LOCATION:</span>
+                <span className="text-zinc-300">Lake of The Ozarks (MO/AR, USA)</span>
+              </div>
+              <div>
+                <span className="text-zinc-600 block mb-1">COVER:</span>
+                <span className="text-zinc-300">Civilian Tourist Cell</span>
+              </div>
+              <div>
+                <span className="text-zinc-600 block mb-1">LOCAL TARGET:</span>
+                <span className="text-zinc-300">Unidentified Criminal Syndicate</span>
+              </div>
+              <div className="pt-4 border-t border-zinc-800">
+                <span className="text-yellow-600/70 block mb-1 text-xs">// FIELD NOTES</span>
+                <span className="text-zinc-500 text-xs italic">
+                  Team is utilizing a steep cliffside rental property for surveillance. Heavy emphasis on civilian blending (lake activities). Do not blow cover.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Easter Egg / Cosmic Lore Note */}
+      <div className="mt-12 p-4 border border-zinc-800 bg-zinc-900/30">
+        <h4 className="text-xs font-mono text-zinc-600 uppercase mb-2 flex items-center gap-2">
+          <FileText size={14} /> DEEP ARCHIVE: COSMIC ANOMALIES [RESTRICTED]
+        </h4>
+        <p className="text-xs text-zinc-500 font-mono">
+          Logs dictate abnormal phenomena existing within the operational universe. Reports of immortal entities—colloquially designated "Vampires"—exist in deep state archives. They do not turn humans. They are bound by karmic consequence and purportedly cursed by a higher power. <Redacted>Directive strictly forbids engagement.</Redacted>
+        </p>
+      </div>
+
+    </div>
+  );
 }
 
-/* ---------- Hero ---------- */
-.r17-hero{
-  position: relative;
-  padding: clamp(14px, 2.2vw, 20px);
-  border-radius: var(--radius);
-  background:
-    linear-gradient(180deg, rgba(12,22,35,.78), rgba(7,12,18,.58));
-  border: 1px solid rgba(87,255,241,.20);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-.r17-hero::before{
-  content:"";
-  position:absolute; inset:0;
-  background:
-    radial-gradient(700px 280px at 15% 0%, rgba(166,255,59,.16), transparent 55%),
-    radial-gradient(500px 260px at 90% 20%, rgba(46,230,255,.18), transparent 52%);
-  opacity:.8;
-  pointer-events:none;
-}
-.r17-hero::after{
-  content:"";
-  position:absolute; inset:-2px;
-  background: linear-gradient(90deg, transparent, rgba(87,255,241,.18), transparent);
-  transform: translateX(-60%);
-  animation: r17Sweep 6.5s ease-in-out infinite;
-  pointer-events:none;
-  opacity:.55;
-}
-@keyframes r17Sweep{
-  0%{ transform: translateX(-70%); }
-  55%{ transform: translateX(70%); }
-  100%{ transform: translateX(70%); }
-}
+```
 
-.r17-hero__top{
-  position:relative;
-  display:grid;
-  gap: 14px;
-  grid-template-columns: 1fr;
-}
-
-.r17-badge{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  padding: 7px 10px;
-  border-radius: 999px;
-  background: rgba(0,0,0,.25);
-  border: 1px solid rgba(87,255,241,.25);
-  width: fit-content;
-  color: var(--muted);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: .14em;
-}
-.r17-badge .dot{
-  width: 9px; height: 9px; border-radius: 50%;
-  background: var(--lime);
-  box-shadow: 0 0 12px rgba(166,255,59,.85);
-  animation: r17Dot 1.8s ease-in-out infinite;
-}
-@keyframes r17Dot{
-  0%,100%{ opacity:.65; transform: scale(.9); }
-  50%{ opacity:1; transform: scale(1.05); }
-}
-
-.r17-hero__id{
-  display:flex;
-  gap: 14px;
-  align-items:flex-start;
-}
-.r17-hero__id .sig{
-  width: 62px; height: 62px;
-  border-radius: 12px;
-  display:grid; place-items:center;
-  background: linear-gradient(145deg, rgba(87,255,241,.18), rgba(0,0,0,.15));
-  border: 1px solid rgba(87,255,241,.30);
-  color: var(--cyan);
-  font-weight: 900;
-  font-size: 20px;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.25) inset, 0 0 26px rgba(46,230,255,.18);
-}
-.r17-hero__id .meta-line{
-  font-weight: 900;
-  font-size: clamp(18px, 2.2vw, 24px);
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  line-height: 1.1;
-}
-.r17-hero__id .meta-sub{
-  margin-top: 6px;
-  color: var(--muted);
-  font-size: 12px;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-}
-
-.glitch{
-  position: relative;
-  color: var(--cyan2);
-  text-shadow: 0 0 18px rgba(46,230,255,.35);
-  animation: r17Glitch 4.2s infinite;
-}
-@keyframes r17Glitch{
-  0%, 92%, 100% { filter: none; }
-  93% { filter: drop-shadow(2px 0 0 rgba(166,255,59,.8)) drop-shadow(-2px 0 0 rgba(255,79,114,.65)); }
-  94% { transform: translateX(-1px); }
-  95% { transform: translateX(1px); }
-  96% { transform: none; }
-}
-
-.r17-kpi{
-  display:flex;
-  gap: 10px;
-  flex-wrap:wrap;
-}
-.kpi{
-  flex: 1 1 140px;
-  min-width: 140px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: rgba(0,0,0,.22);
-  border: 1px solid rgba(87,255,241,.20);
-  box-shadow: 0 10px 22px rgba(0,0,0,.25);
-}
-.kpi .k{
-  color: var(--muted);
-  font-size: 11px;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-}
-.kpi .v{
-  margin-top: 4px;
-  font-weight: 900;
-  letter-spacing: .06em;
-  color: var(--ink);
-  text-shadow: 0 0 16px rgba(87,255,241,.18);
-}
-
-.r17-hero__cta{
-  position:relative;
-  margin-top: 14px;
-  display:grid;
-  gap: 10px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-.r17-cta{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 10px;
-  padding: 12px 12px;
-  border-radius: 12px;
-  text-decoration:none;
-  color: var(--ink);
-  background:
-    linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.18));
-  border: 1px solid rgba(87,255,241,.22);
-  box-shadow: var(--shadow2);
-  position:relative;
-  overflow:hidden;
-  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease, filter .22s ease;
-}
-.r17-cta::before{
-  content:"";
-  position:absolute; inset:0;
-  background: radial-gradient(400px 120px at 10% 0%, rgba(166,255,59,.16), transparent 60%);
-  opacity:.65;
-  pointer-events:none;
-}
-.r17-cta .ico{ opacity:.95; }
-.r17-cta .arr{ color: var(--cyan2); font-weight: 900; }
-.r17-cta:hover{
-  transform: translateY(-2px);
-  border-color: rgba(166,255,59,.35);
-  box-shadow: 0 16px 42px rgba(0,0,0,.50), 0 0 0 1px rgba(166,255,59,.15) inset;
-  filter: saturate(1.12);
-}
-
-@media (max-width: 900px){
-  .r17-hero__cta{ grid-template-columns: 1fr; }
-}
-
-/* ---------- Main layout ---------- */
-.r17-gridwrap{
-  margin-top: 18px;
-  display:grid;
-  grid-template-columns: 1.35fr .85fr;
-  gap: 14px;
-}
-@media (max-width: 980px){
-  .r17-gridwrap{ grid-template-columns: 1fr; }
-}
-
-.r17-panel{
-  position:relative;
-  padding: 14px;
-  border-radius: var(--radius);
-  background: linear-gradient(180deg, rgba(10,18,28,.66), rgba(7,12,18,.55));
-  border: 1px solid rgba(87,255,241,.18);
-  box-shadow: var(--shadow2);
-  overflow:hidden;
-}
-.r17-panel::before{
-  content:"";
-  position:absolute; inset:0;
-  background:
-    repeating-linear-gradient(135deg, rgba(255,255,255,.03) 0px, rgba(255,255,255,.03) 1px, transparent 1px, transparent 8px);
-  opacity:.18;
-  pointer-events:none;
-}
-.r17-panel__hdr{
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-.r17-panel__hdr h3{
-  margin:0;
-  font-size: 13px;
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-.r17-chip{
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--cyan);
-  background: rgba(0,0,0,.25);
-  border: 1px solid rgba(87,255,241,.26);
-  box-shadow: 0 0 18px rgba(46,230,255,.12);
-}
-.r17-chip--amber{
-  color: var(--amber);
-  border-color: rgba(255,204,102,.35);
-  box-shadow: 0 0 18px rgba(255,204,102,.12);
-}
-
-/* ---------- Spotlight ---------- */
-.r17-spotlight{
-  position:relative;
-  display:grid;
-  grid-template-columns: 300px 1fr;
-  gap: 14px;
-}
-@media (max-width: 860px){
-  .r17-spotlight{ grid-template-columns: 1fr; }
-}
-
-.r17-portrait__frame{
-  position:relative;
-  border-radius: 16px;
-  overflow:hidden;
-  background: rgba(0,0,0,.25);
-  border: 1px solid rgba(87,255,241,.22);
-  box-shadow: 0 20px 55px rgba(0,0,0,.55);
-  isolation:isolate;
-}
-.r17-portrait__frame::before{
-  content:"";
-  position:absolute; inset:0;
-  background:
-    radial-gradient(500px 200px at 20% 0%, rgba(46,230,255,.22), transparent 60%),
-    radial-gradient(400px 220px at 90% 10%, rgba(166,255,59,.14), transparent 60%);
-  z-index:1;
-  pointer-events:none;
-}
-.r17-portrait__frame::after{
-  content:"";
-  position:absolute; inset:-2px;
-  background: linear-gradient(90deg, transparent, rgba(87,255,241,.22), transparent);
-  transform: translateX(-80%);
-  animation: r17Sweep2 5.2s ease-in-out infinite;
-  z-index:2;
-  pointer-events:none;
-  opacity:.55;
-}
-@keyframes r17Sweep2{
-  0%{ transform: translateX(-90%); }
-  45%{ transform: translateX(80%); }
-  100%{ transform: translateX(80%); }
-}
-.r17-portrait__frame img{
-  display:block;
-  width:100%;
-  height:auto;
-  transform: scale(1.02);
-  filter: contrast(1.05) saturate(1.08) brightness(1.02);
-}
-.r17-portrait__hud{
-  position:absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  z-index:3;
-  padding: 10px 10px;
-  border-radius: 12px;
-  background: rgba(0,0,0,.45);
-  border: 1px solid rgba(87,255,241,.22);
-  backdrop-filter: blur(6px);
-}
-.hud-line{
-  display:flex;
-  justify-content:space-between;
-  gap: 10px;
-  font-size: 11px;
-  letter-spacing:.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 4px 0;
-}
-.hud-line b{
-  color: var(--cyan2);
-  letter-spacing: .14em;
-  text-shadow: 0 0 14px rgba(46,230,255,.25);
-}
-
-.r17-dossier{
-  position:relative;
-  border-radius: 16px;
-  padding: 14px 14px;
-  background: rgba(0,0,0,.18);
-  border: 1px solid rgba(166,255,59,.18);
-  box-shadow: 0 10px 28px rgba(0,0,0,.35);
-}
-.r17-dossier__tag{
-  display:inline-block;
-  margin-bottom: 10px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: var(--lime);
-  background: rgba(166,255,59,.08);
-  border: 1px solid rgba(166,255,59,.22);
-}
-.r17-dossier p{
-  margin: 0 0 10px 0;
-  color: var(--ink);
-  line-height: 1.6;
-  font-size: 14px;
-}
-.r17-emph{
-  color: var(--amber);
-  text-shadow: 0 0 12px rgba(255,204,102,.14);
-}
-
-.r17-minirow{
-  margin-top: 10px;
-  display:flex;
-  flex-wrap:wrap;
-  gap: 8px;
-}
-.r17-mini{
-  text-decoration:none;
-  color: var(--ink);
-  font-size: 12px;
-  padding: 8px 10px;
-  border-radius: 12px;
-  background: rgba(0,0,0,.20);
-  border: 1px solid rgba(87,255,241,.18);
-  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
-}
-.r17-mini:hover{
-  transform: translateY(-2px);
-  border-color: rgba(87,255,241,.35);
-  box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(46,230,255,.14) inset;
-}
-.r17-mini--hot{
-  border-color: rgba(255,204,102,.22);
-}
-.r17-mini--hot:hover{
-  border-color: rgba(255,204,102,.42);
-  box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(255,204,102,.14) inset;
-}
-
-/* ---------- Buttons grid ---------- */
-.r17-btngrid{
-  display:grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-.r17-btn{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 12px;
-  padding: 12px 12px;
-  border-radius: 14px;
-  text-decoration:none;
-  color: var(--ink);
-  background:
-    linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.16));
-  border: 1px solid rgba(255,204,102,.18);
-  box-shadow: 0 14px 36px rgba(0,0,0,.45);
-  position:relative;
-  overflow:hidden;
-  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease, filter .22s ease;
-}
-.r17-btn::before{
-  content:"";
-  position:absolute; inset:0;
-  background: radial-gradient(420px 140px at 10% 0%, rgba(255,204,102,.16), transparent 60%);
-  opacity:.7;
-  pointer-events:none;
-}
-.r17-btn .bico{ opacity:.95; }
-.r17-btn .arr{ color: var(--amber); font-weight: 900; }
-.r17-btn:hover{
-  transform: translateY(-2px);
-  border-color: rgba(255,204,102,.40);
-  box-shadow: 0 18px 46px rgba(0,0,0,.52), 0 0 0 1px rgba(255,204,102,.12) inset;
-  filter: saturate(1.10);
-}
-
-/* ---------- Banner ---------- */
-.r17-banner{
-  margin-top: 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(87,255,241,.20);
-  overflow:hidden;
-  background: rgba(0,0,0,.20);
-}
-.r17-banner__a{
-  display:flex;
-  align-items:center;
-  gap: 12px;
-  justify-content:space-between;
-  text-decoration:none;
-  color: var(--ink);
-  padding: 12px 12px;
-  position:relative;
-}
-.r17-banner__a::before{
-  content:"";
-  position:absolute; inset:0;
-  background:
-    linear-gradient(90deg, rgba(46,230,255,.10), transparent 40%, rgba(166,255,59,.10)),
-    repeating-linear-gradient(135deg, rgba(255,255,255,.03) 0px, rgba(255,255,255,.03) 1px, transparent 1px, transparent 10px);
-  opacity:.85;
-  pointer-events:none;
-}
-.r17-banner__a .txt{
-  font-weight: 900;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  font-size: 12px;
-}
-.r17-banner__a .tag{
-  color: var(--cyan2);
-  font-weight: 900;
-  letter-spacing: .10em;
-}
-.r17-banner__a .arr{ color: var(--lime); font-weight: 900; }
-.r17-banner__a:hover .txt{ text-shadow: 0 0 14px rgba(87,255,241,.22); }
-.pulse{
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--cyan2);
-  box-shadow: 0 0 0 rgba(46,230,255,.0);
-  animation: r17Pulse 1.8s ease-out infinite;
-  position:relative;
-  flex: 0 0 auto;
-}
-@keyframes r17Pulse{
-  0%{ box-shadow: 0 0 0 0 rgba(46,230,255,.55); transform: scale(.95); opacity: .95; }
-  70%{ box-shadow: 0 0 0 14px rgba(46,230,255,.0); transform: scale(1.0); opacity: 1; }
-  100%{ box-shadow: 0 0 0 0 rgba(46,230,255,.0); opacity: .9; }
-}
-
-/* ---------- Details ---------- */
-.r17-details{
-  margin-top: 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(87,255,241,.18);
-  background: rgba(0,0,0,.18);
-  overflow:hidden;
-}
-.r17-details summary{
-  cursor:pointer;
-  user-select:none;
-  padding: 12px 12px;
-  font-weight: 900;
-  font-size: 12px;
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  color: var(--cyan);
-  background: linear-gradient(90deg, rgba(46,230,255,.10), rgba(0,0,0,.0));
-  position: relative;
-}
-.r17-details summary::after{
-  content:"▾";
-  position:absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--lime);
-  text-shadow: 0 0 14px rgba(166,255,59,.28);
-  transition: transform .2s ease;
-}
-.r17-details[open] summary::after{
-  transform: translateY(-50%) rotate(180deg);
-}
-.r17-details__content{
-  padding: 12px 12px 14px 12px;
-  border-top: 1px solid rgba(87,255,241,.12);
-  animation: r17Drop .28s ease-out both;
-}
-@keyframes r17Drop{
-  from{ opacity:0; transform: translateY(-6px); }
-  to{ opacity:1; transform: translateY(0); }
-}
-.r17-list{
-  margin:0;
-  padding-left: 18px;
-  color: var(--ink);
-  line-height: 1.6;
-  font-size: 13px;
-}
-.r17-list b{ color: var(--amber); }
-
-/* ---------- Footer ---------- */
-.r17-footer{
-  margin-top: 14px;
-  padding: 12px;
-  border-radius: 14px;
-  background: rgba(0,0,0,.18);
-  border: 1px solid rgba(87,255,241,.14);
-  color: var(--muted);
-  display:flex;
-  gap: 10px;
-  justify-content:center;
-  flex-wrap:wrap;
-  font-size: 12px;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-}
-.r17-footer__l{ color: var(--cyan2); font-weight: 900; }
-.r17-footer__m{ opacity:.6; }
-.r17-footer__r{ opacity:.85; }
-
-/* =========================================================
-   PLATFORM OVERRIDES / BOT CARD EFFECTS (ENHANCED)
-   - These target your platform classes, no JS required.
-   ========================================================= */
-
-/* Follow button: cyber-mil style, no rainbow */
-.css-y9k5u7{
-  position: absolute;
-  top: 160px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: max-content;
-  z-index: 10;
-}
-
-.Btn span{ visibility: hidden; }
-
-/* Not following */
-.Btn[data-following='false']::before{
-  position:absolute;
-  content:"FOLLOW // LINK" !important;
-  padding: 10px 22px;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  color: #071219;
-  border-radius: 999px;
-  border: 1px solid rgba(87,255,241,.55);
-  background:
-    linear-gradient(180deg, rgba(166,255,59,.95), rgba(87,255,241,.85));
-  box-shadow:
-    0 10px 26px rgba(0,0,0,.35),
-    0 0 0 2px rgba(0,0,0,.15) inset,
-    0 0 24px rgba(46,230,255,.22);
-  animation: r17FollowPulse 2.4s ease-in-out infinite;
-  text-shadow: none;
-}
-@keyframes r17FollowPulse{
-  0%,100%{ transform: translateY(0); filter: saturate(1); }
-  50%{ transform: translateY(-1px); filter: saturate(1.08); }
-}
-
-/* Following */
-.Btn[data-following='true']::before{
-  position:absolute;
-  content:"FOLLOWING ✔" !important;
-  padding: 10px 22px;
-  font-size: 12px;
-  font-weight: 900;
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  color: var(--cyan2);
-  border-radius: 999px;
-  border: 1px solid rgba(87,255,241,.45);
-  background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.25));
-  box-shadow:
-    0 12px 28px rgba(0,0,0,.40),
-    0 0 0 1px rgba(87,255,241,.18) inset,
-    0 0 22px rgba(46,230,255,.14);
-}
-
-/* Bot cards / containers */
-.css-1s5evre{
-  position: relative !important;
-  overflow: hidden !important;
-  border-radius: 16px !important;
-  background:
-    radial-gradient(900px 240px at 20% 0%, rgba(46,230,255,.16), transparent 60%),
-    radial-gradient(700px 220px at 90% 10%, rgba(166,255,59,.10), transparent 58%),
-    linear-gradient(180deg, rgba(12,22,35,.85), rgba(6,10,16,.65)) !important;
-  border: 1px solid rgba(87,255,241,.22) !important;
-  box-shadow:
-    0 18px 44px rgba(0,0,0,.55),
-    0 0 0 1px rgba(0,0,0,.25) inset !important;
-  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease, filter .22s ease;
-  animation: r17CardBreath 5.5s ease-in-out infinite;
-}
-@keyframes r17CardBreath{
-  0%,100%{ filter: saturate(1) contrast(1.02); }
-  50%{ filter: saturate(1.06) contrast(1.06); }
-}
-
-.css-1s5evre::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    repeating-linear-gradient(135deg,
-      rgba(255,255,255,.035) 0px,
-      rgba(255,255,255,.035) 1px,
-      transparent 1px,
-      transparent 9px
-    ),
-    radial-gradient(600px 200px at 15% 0%, rgba(255,204,102,.10), transparent 60%);
-  opacity:.35;
-  pointer-events:none;
-  z-index: 1;
-}
-.css-1s5evre::after{
-  content:"";
-  position:absolute;
-  inset:-2px;
-  background: linear-gradient(90deg, transparent, rgba(87,255,241,.22), transparent);
-  transform: translateX(-85%);
-  animation: r17CardSweep 6.2s ease-in-out infinite;
-  opacity:.7;
-  pointer-events:none;
-  z-index: 2;
-}
-@keyframes r17CardSweep{
-  0%{ transform: translateX(-90%); }
-  45%{ transform: translateX(85%); }
-  100%{ transform: translateX(85%); }
-}
-
-.css-1s5evre:hover{
-  transform: translateY(-3px) scale(1.01);
-  border-color: rgba(166,255,59,.34) !important;
-  box-shadow:
-    0 26px 70px rgba(0,0,0,.65),
-    0 0 0 1px rgba(46,230,255,.18) inset !important;
-}
-
-/* Inner / misc platform elements you referenced */
-.css-0, .css-12vfojg, .css-dltla, .css-1jf56se{
-  background: rgba(0,0,0,0) !important;
-}
-
-.css-1jf56se, .css-dltla, .css-19n2nzy, .css-0{
-  border-radius: 0px !important;
-}
-
-/* Tag / chip button inside cards (enhanced hover) */
-.css-x2gqu0{
-  border: 1px solid rgba(87,255,241,.22) !important;
-  border-radius: 999px !important;
-  background: rgba(0,0,0,.22) !important;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
-  color: var(--cyan2) !important;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.18) inset, 0 10px 22px rgba(0,0,0,.25) !important;
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, filter .2s ease !important;
-}
-.css-x2gqu0:hover, .css-x2gqu0[data-hover]{
-  transform: translateY(-2px) scale(1.04) !important;
-  border-color: rgba(166,255,59,.40) !important;
-  box-shadow:
-    0 16px 38px rgba(0,0,0,.45),
-    0 0 0 1px rgba(166,255,59,.14) inset !important;
-  filter: saturate(1.12) !important;
-}
-
-/* Divider line in cards */
-.css-1lgnt2x{
-  border-top: 1px solid rgba(87,255,241,.22) !important;
-  width: 82% !important;
-  opacity: .9 !important;
-}
-
-/* Some text accents */
-.css-wd8hou{
-  font-weight: 900 !important;
-  background: linear-gradient(90deg, var(--cyan2), var(--lime), var(--amber)) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  text-shadow: 0 0 18px rgba(46,230,255,.15) !important;
-  animation: r17Shimmer 6s linear infinite;
-}
-@keyframes r17Shimmer{
-  0%{ background-position: 200% 0; }
-  100%{ background-position: -200% 0; }
-}
-
-/* Icons tint / filters (kept but modernized) */
-.css-hl99y6{
-  filter: brightness(0) saturate(100%)
-    invert(88%) sepia(28%) saturate(3100%)
-    hue-rotate(120deg) brightness(108%) contrast(102%) !important;
-}
-
-/* Optional: soften harsh corners on some platform containers */
-.css-18bnokj{
-  border-radius: 14px !important;
-  box-shadow: 0 12px 30px rgba(0,0,0,.45) !important;
-}
-
-/* =========================================================
-   Mobile tuning
-   ========================================================= */
-@media (max-width: 520px){
-  .r17-hero__id{ align-items:center; }
-  .r17-hero__id .sig{ width: 54px; height: 54px; }
-  .r17-hero__id .meta-sub{ letter-spacing: .10em; }
-}
-</style>
-
-</body>
-</html>
