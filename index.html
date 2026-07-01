@@ -1,382 +1,510 @@
-react
-import React, { useState, useEffect } from 'react';
-import { ShieldAlert, Crosshair, FileText, Skull, Lock, ChevronRight, Fingerprint, Activity, Radio, Map } from 'lucide-react';
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RASKOL 17 | Black Seal Clearance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blood-red: #7a0000;
+            --blood-bright: #b30000;
+            --dark-bg: #050505;
+            --glass-bg: rgba(12, 12, 12, 0.65);
+            --kintsugi-gold: #c5a059;
+        }
 
-// --- Reusable Components ---
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--dark-bg);
+            color: #d1d5db; /* gray-300 */
+            overflow-x: hidden;
+            /* Subtle radial blood gradient in the background */
+            background-image: radial-gradient(circle at 50% 0%, rgba(30, 0, 0, 0.6) 0%, var(--dark-bg) 50%);
+            background-attachment: fixed;
+        }
 
-const Redacted = ({ children }) => (
-  <span className="bg-zinc-800 text-zinc-800 hover:text-red-500 hover:bg-transparent transition-all duration-300 cursor-crosshair px-1 select-none font-mono font-bold tracking-widest border border-transparent hover:border-red-500/30">
-    {children}
-  </span>
-);
+        /* Gothic / Sovereign Typography */
+        h1, h2, h3, .font-gothic {
+            font-family: 'Cinzel', serif;
+        }
 
-const GlitchText = ({ text }) => {
-  return (
-    <div className="relative inline-block group">
-      <span className="relative z-10">{text}</span>
-      <span className="absolute top-0 left-0 -ml-[1px] text-red-500 opacity-0 group-hover:opacity-70 group-hover:animate-pulse z-0 mix-blend-screen">{text}</span>
-      <span className="absolute top-0 left-0 ml-[1px] text-blue-500 opacity-0 group-hover:opacity-70 group-hover:animate-pulse z-0 mix-blend-screen delay-75">{text}</span>
+        /* Scanline Overlay for Military Terminal Feel */
+        .scanlines::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 4px, 3px 100%;
+            z-index: 9998;
+            pointer-events: none;
+            opacity: 0.2;
+        }
+
+        /* Dark Glassmorphism with Kintsugi Detail */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(40, 40, 40, 0.8);
+            border-top: 1px solid rgba(122, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(122, 0, 0, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(150, 0, 0, 0.6);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.95), inset 0 0 30px rgba(122, 0, 0, 0.15);
+            transform: translateY(-4px);
+        }
+
+        /* THE KINTSUGI CRACK EFFECT - Barely noticeable SVG background */
+        .glass-card::after {
+            content: '';
+            position: absolute;
+            top: -20%; left: -20%; width: 140%; height: 140%;
+            pointer-events: none;
+            /* Encoded SVG of scattered cracks with gold (#c5a059) */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cpath d='M10,0 L35,50 L10,100 L50,140 L0,200 L70,290 M140,0 L120,40 L170,80 L150,170 L210,240 M280,0 L250,70 L310,130 L270,230 M0,70 L40,80 L80,50 L130,100 L180,70 L230,120 L300,100 M60,140 L90,150 L140,110' stroke='%23c5a059' stroke-width='0.5' fill='none' opacity='0.4'/%3E%3Cpath d='M35,50 L70,30 M170,80 L210,60 M50,140 L90,150 M250,70 L210,90 M230,120 L250,170' stroke='%23c5a059' stroke-width='0.25' fill='none' opacity='0.2'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            opacity: 0.12; /* VERY subtle */
+            z-index: 0;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            transform: rotate(3deg);
+            mix-blend-mode: color-dodge;
+        }
+
+        .glass-card:hover::after {
+            opacity: 0.35; /* Shimmers faintly on hover */
+            transform: rotate(3deg) scale(1.02);
+        }
+
+        .glass-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Aesthetic Text & Gradients */
+        .text-blood {
+            color: var(--blood-red);
+        }
+        .glow-blood {
+            text-shadow: 0 0 10px rgba(179, 0, 0, 0.7), 0 0 20px rgba(122, 0, 0, 0.4);
+        }
+        .glow-box {
+            box-shadow: 0 0 15px rgba(122, 0, 0, 0.5);
+        }
+
+        /* Scroll Reveal Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+
+        /* Loader Sequence */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: #020202;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.2s ease-out;
+        }
+        
+        .typewriter-text {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid var(--blood-red);
+            width: 0;
+            animation: typing 1.5s steps(40, end) forwards, blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--blood-red); }
+        }
+        
+        .pulse-core {
+            width: 12px;
+            height: 12px;
+            background: var(--blood-bright);
+            border-radius: 50%;
+            margin-bottom: 2rem;
+            animation: pulse-blood 1.5s infinite;
+        }
+        
+        @keyframes pulse-blood {
+            0% { box-shadow: 0 0 0 0 rgba(179, 0, 0, 0.8); }
+            70% { box-shadow: 0 0 0 25px rgba(179, 0, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(179, 0, 0, 0); }
+        }
+
+        /* Glitch effect for hover */
+        .glitch-hover:hover {
+            animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: #fff;
+        }
+        @keyframes glitch-anim {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 1px) }
+            40% { transform: translate(-1px, -1px) }
+            60% { transform: translate(2px, 1px) }
+            80% { transform: translate(1px, -1px) }
+            100% { transform: translate(0) }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--dark-bg); }
+        ::-webkit-scrollbar-thumb { background: #330000; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--blood-red); }
+    </style>
+</head>
+<body class="scanlines">
+
+    <!-- LOADING SCREEN -->
+    <div id="loader">
+        <div class="pulse-core"></div>
+        <div class="font-rajdhani text-red-700 tracking-[0.3em] text-sm md:text-base">
+            <div class="typewriter-text">ESTABLISHING SECURE CONNECTION...</div>
+        </div>
+        <div class="font-rajdhani text-gray-500 tracking-[0.2em] text-xs mt-2 opacity-0" id="loader-msg-2" style="animation: fadeIn 0.5s 1.8s forwards;">
+            DIRECTIVE 17 ACKNOWLEDGED. BLACK SEAL CLEARANCE ACCEPTED.
+        </div>
     </div>
-  );
-};
 
-// --- Main Application ---
-
-export default function App() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [bootSequence, setBootSequence] = useState(true);
-
-  // Simulate a boot-up terminal sequence
-  useEffect(() => {
-    const timer = setTimeout(() => setBootSequence(false), 2500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (bootSequence) {
-    return (
-      <div className="min-h-screen bg-black text-green-500 font-mono p-6 flex flex-col justify-center items-start overflow-hidden">
-        <div className="max-w-2xl mx-auto space-y-2">
-          <p className="animate-pulse">{'>'} INITIALIZING SECURE CONNECTION...</p>
-          <p className="opacity-0 animate-[fadeIn_0.5s_ease-in-out_0.5s_forwards]">{'>'} BYPASSING GRU FIREWALLS...</p>
-          <p className="opacity-0 animate-[fadeIn_0.5s_ease-in-out_1s_forwards]">{'>'} DECRYPTING DIRECTIVE NO. 17...</p>
-          <p className="opacity-0 animate-[fadeIn_0.5s_ease-in-out_1.5s_forwards] text-red-500">{'>'} WARNING: BLACK SEAL ZERKALO CLEARANCE REQUIRED.</p>
-          <p className="opacity-0 animate-[fadeIn_0.5s_ease-in-out_2s_forwards]">{'>'} ACCESS GRANTED.</p>
+    <!-- NAVBAR -->
+    <nav class="fixed w-full top-0 z-50 glass-card border-t-0 border-l-0 border-r-0 py-4 px-6 md:px-12 flex justify-between items-center">
+        <div class="font-gothic text-2xl tracking-[0.2em] font-bold text-gray-100 flex items-center gap-3">
+            <span class="text-blood glow-blood">|</span> RASKOL 17
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-300 font-sans selection:bg-red-900 selection:text-white relative">
-      {/* CRT Scanline Overlay */}
-      <div className="pointer-events-none fixed inset-0 z-50 opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%]"></div>
-
-      {/* Header Navigation */}
-      <header className="border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row justify-between items-center py-4 gap-4">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-red-900 flex items-center justify-center border border-red-700">
-                <Skull className="text-zinc-100" size={24} />
-              </div>
-              <div>
-                <h1 className="text-2xl font-black tracking-tighter text-zinc-100 leading-none">
-                  <GlitchText text="RASKOL 17" />
-                </h1>
-                <p className="text-red-600 text-xs font-mono font-bold tracking-widest uppercase">СОВЕРШЕННО СЕКРЕТНО</p>
-              </div>
-            </div>
-
-            <nav className="flex space-x-1 bg-zinc-900 p-1 rounded-sm border border-zinc-800">
-              {['overview', 'dossiers', 'operations'].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-1.5 text-xs font-mono uppercase tracking-wider transition-colors ${
-                    activeTab === tab
-                      ? 'bg-red-900/40 text-red-400 border border-red-900/50'
-                      : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </nav>
-          </div>
+        <div class="hidden md:flex gap-8 font-rajdhani text-sm tracking-[0.15em] text-gray-400 font-semibold uppercase">
+            <a href="#intel" class="hover:text-red-500 transition-colors glitch-hover">Intel</a>
+            <a href="#roster" class="hover:text-red-500 transition-colors glitch-hover">Operatives</a>
+            <a href="#viper" class="hover:text-red-500 transition-colors glitch-hover">Adversaries</a>
         </div>
-      </header>
+    </nav>
 
-      {/* Main Content Area */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {activeTab === 'overview' && <OverviewSection />}
-        {activeTab === 'dossiers' && <DossiersSection />}
-        {activeTab === 'operations' && <OperationsSection />}
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-zinc-900 bg-black py-8 mt-12">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <Lock className="mx-auto text-zinc-700 mb-4" size={20} />
-          <p className="text-zinc-600 text-xs font-mono max-w-2xl mx-auto uppercase">
-            The Russian Federation categorically denies the existence of RASKOL 17. All operatives hold Black Seal "ZERKALO" status. 
-            If captured or killed, they will be disavowed as foreign mercenaries. Loyalty is not to orders. Loyalty is not to medals. 
-            Loyalty is to the fracture that protects the core.
-          </p>
-        </div>
-      </footer>
-    </div>
-  );
-}
-
-// --- Sections ---
-
-function OverviewSection() {
-  return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Hero */}
-      <div className="relative border border-zinc-800 bg-zinc-900/50 p-6 sm:p-10 overflow-hidden">
-        <div className="absolute top-0 right-0 p-4 opacity-10">
-          <ShieldAlert size={120} />
-        </div>
-        <div className="relative z-10 max-w-3xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-950/50 border border-red-900/50 text-red-500 text-xs font-mono mb-6">
-            <Radio size={14} className="animate-pulse" />
-            <span>OPERATIONAL STATUS: BLACK SEAL CLEARANCE</span>
-          </div>
-          <h2 className="text-4xl sm:text-5xl font-black text-zinc-100 uppercase tracking-tighter mb-6">
-            A controlled break from convention.
-          </h2>
-          <p className="text-lg text-zinc-400 mb-4 leading-relaxed">
-            In Russian, <span className="text-zinc-200 font-bold">“раскол” (Raskol)</span> means schism, split, or fracture. 
-            Historically referencing violent ideological separation, Col. Rolan Varkoff chose the name deliberately. 
-            RASKOL 17 does not represent betrayal. It represents a fracture made to protect the state from threats it cannot officially address.
-          </p>
-          <div className="flex gap-4 mt-8">
-            <div className="bg-black/50 border border-zinc-800 p-4 flex-1">
-              <h4 className="text-zinc-500 text-xs font-mono uppercase mb-1">Formed</h4>
-              <p className="text-zinc-200 font-medium">2014 (Post-Crimea)</p>
-            </div>
-            <div className="bg-black/50 border border-zinc-800 p-4 flex-1">
-              <h4 className="text-zinc-500 text-xs font-mono uppercase mb-1">Origin</h4>
-              <p className="text-zinc-200 font-medium">Directive No. 17</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Origin Story */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <h3 className="text-2xl font-bold text-zinc-100 flex items-center gap-3 border-b border-zinc-800 pb-2">
-            <Activity className="text-red-500" /> DIRECTIVE NO. 17
-          </h3>
-          <div className="space-y-4 text-zinc-400 font-serif leading-relaxed">
-            <p>
-              Following the 2014 annexation of Crimea, GRU high command faced mounting unconventional threats: NATO-backed special forces, Western proxies, and internal destabilization cells. Conventional protocol was too slow and too visible.
+    <!-- HERO SECTION -->
+    <header class="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+        <!-- Abstract atmospheric background elements -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] max-w-[800px] max-h-[800px] bg-red-900 rounded-full blur-[150px] opacity-10 pointer-events-none"></div>
+        
+        <div class="z-10 text-center px-4 max-w-5xl mx-auto reveal">
+            <h3 class="font-rajdhani text-red-700 tracking-[0.4em] text-sm md:text-lg mb-4 font-bold">СОВЕРШЕННО СЕКРЕТНО (TOP SECRET)</h3>
+            <h1 class="font-gothic text-6xl md:text-8xl lg:text-9xl font-black tracking-widest text-white mb-6 drop-shadow-2xl">
+                RASKOL <span class="text-blood glow-blood">17</span>
+            </h1>
+            <p class="font-rajdhani text-xl md:text-2xl text-gray-400 italic tracking-wide max-w-2xl mx-auto leading-relaxed border-l-2 border-red-900 pl-6 text-left">
+                "We are the fracture they pretend doesn't exist. The part of the Federation that doesn't blink."<br>
+                <span class="block mt-3 text-sm text-gray-500 not-italic uppercase tracking-widest">— Colonel Rolan Varkoff</span>
             </p>
-            <p>
-              Varkoff submitted an unorthodox proposal: create a small detachment with no paper trail, no uniforms, and no oversight. A unit not bound by treaties or official existence. It was officially rejected. Three weeks later, Varkoff and four operatives vanished from all military records.
-            </p>
-            <p>
-              They resurfaced months later operating under black directive. The "17" refers to a classified Kremlin memorandum authorizing a deniable unit capable of total autonomy. One physical copy was hand-delivered. It was not filed. But it was acted upon.
-            </p>
-          </div>
-        </div>
-
-        {/* Quick Facts Sidebar */}
-        <div className="space-y-6">
-          <div className="bg-zinc-900 border border-zinc-800 p-5">
-            <h4 className="text-sm font-mono text-zinc-100 uppercase mb-4 flex items-center gap-2">
-              <Crosshair size={16} className="text-red-500" /> Modus Operandi
-            </h4>
-            <ul className="space-y-3 text-sm text-zinc-400 font-mono">
-              <li className="flex items-start gap-2">
-                <ChevronRight size={16} className="text-zinc-600 shrink-0 mt-0.5" />
-                Eliminate Western-backed saboteurs on Russian soil.
-              </li>
-              <li className="flex items-start gap-2">
-                <ChevronRight size={16} className="text-zinc-600 shrink-0 mt-0.5" />
-                Dismantle arms trafficking pipelines.
-              </li>
-              <li className="flex items-start gap-2">
-                <ChevronRight size={16} className="text-zinc-600 shrink-0 mt-0.5" />
-                Extract or execute internal traitors.
-              </li>
-              <li className="flex items-start gap-2">
-                <ChevronRight size={16} className="text-zinc-600 shrink-0 mt-0.5" />
-                Operate without attribution (accidents, missing persons).
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DossiersSection() {
-  const operatives = [
-    {
-      name: "Rolan Varkoff",
-      rank: "Colonel",
-      role: "Commander",
-      stats: { height: "213 cm (7'0\")", weight: "124.7 kg", status: "Active" },
-      desc: "Founder of RASKOL 17. Bears significant facial surgical scars and partial paralysis, usually concealed beneath a balaclava even off-duty. Mesomorphic build, 8-10% body fat. Commands with absolute, lethal authority.",
-      quote: "If violence is required, he will provide it."
-    },
-    {
-      name: "Konstantin Yegorov",
-      rank: "Captain",
-      role: "Psychological Warfare / Sniper",
-      stats: { height: "188 cm", age: "32", status: "Active" },
-      desc: "Callsign 'Kostya'. Highly cerebral, provocative, and volatile mastermind of psy-ops. Recruited at 17 after a stint as a petty dealer. Uses deception, radio jammers, and sonic emitters to break enemy will before engaging.",
-      quote: "Obeys orders only when it suits his vision—it usually works."
-    },
-    {
-      name: "Ivan Shevchenko",
-      rank: "Sergeant",
-      role: "Aerial Acrobat / Stealth Entry",
-      stats: { height: "185 cm", age: "27", status: "Active" },
-      desc: "Callsign 'Vanya'. Raised by a mother who trained him in aerial silks and hoop, transforming him into a lethal vertical combatant. Strikes silently from above. Known as the only 'good boy' in the unit despite his lethal precision.",
-      quote: "Silent, precise, and deadly from above."
-    },
-    {
-      name: "Dimitri Rustov",
-      rank: "Lieutenant",
-      role: "Assault / Demolitions",
-      stats: { status: "Active", clearance: "ZERKALO" },
-      desc: "Grew up alongside Konstantin, shares a bitter rivalry. Possesses a discreet but explosive temper that Konstantin constantly tests. Arrested for stealing before being absorbed into the black-ops pipeline.",
-      quote: "[REDACTED BY COMMAND]"
-    },
-    {
-      name: "Lev Svyatoslav",
-      rank: "Major",
-      role: "Spetsnaz Officer / Second-in-Command",
-      stats: { status: "Active", clearance: "ZERKALO" },
-      desc: "Original Spetsnaz operative who worked alongside Varkoff during the early pre-Raskol black-ops missions. Instrumental in the initial recruitment pipeline, hauling recruits from temporary holding cells into the shadow unit.",
-      quote: "The bedrock of the fracture."
-    }
-  ];
-
-  return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="border-b border-zinc-800 pb-4 mb-8">
-        <h2 className="text-3xl font-black text-zinc-100 uppercase tracking-tight flex items-center gap-3">
-          <Fingerprint className="text-red-500" size={32} />
-          Personnel Dossiers
-        </h2>
-        <p className="text-zinc-500 font-mono mt-2">All files classified. Digital footprints erased post-2014.</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {operatives.map((op, idx) => (
-          <div key={idx} className="bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors group relative overflow-hidden flex flex-col">
-            {/* Top Red Bar */}
-            <div className="h-1 w-full bg-zinc-800 group-hover:bg-red-800 transition-colors"></div>
             
-            <div className="p-6 flex-1 flex flex-col">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-zinc-100 uppercase">{op.name}</h3>
-                  <p className="text-red-500 text-sm font-mono font-semibold">{op.rank} // {op.role}</p>
+            <div class="mt-16">
+                <a href="#intel" class="inline-block border border-red-900 text-gray-300 font-rajdhani uppercase tracking-[0.2em] text-sm py-3 px-8 hover:bg-red-900/30 hover:border-red-500 transition-all duration-300">
+                    Access Dossier
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- LORE / INTEL SECTION -->
+    <section id="intel" class="py-24 px-6 md:px-12 relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="w-full md:w-1/2 reveal">
+                    <div class="glass-card p-8 md:p-10 relative">
+                        <div class="absolute top-0 right-0 p-4 font-rajdhani text-red-800 text-xs tracking-widest font-bold">
+                            // DIRECTIVE 17
+                        </div>
+                        <h2 class="font-gothic text-3xl md:text-4xl text-gray-100 mb-6 border-b border-gray-800 pb-4">
+                            The <span class="text-blood">Schism</span>
+                        </h2>
+                        <p class="mb-4 text-gray-400 leading-relaxed text-lg">
+                            In Russian, "раскол" (Raskol) means schism, split, or fracture. Originating from GRU Directorate S, RASKOL 17 was formed post-2014 out of dissent. It is an unacknowledged detachment operating completely off the grid.
+                        </p>
+                        <p class="text-gray-400 leading-relaxed text-lg">
+                            No paper trail. No uniforms. No oversight. The Federation denies their existence. RASKOL 17 is the authorized fracture made to protect the state from threats it cannot officially address. They leave no digital footprint. They carry no flag. 
+                        </p>
+                    </div>
                 </div>
-                <Skull size={20} className="text-zinc-700 group-hover:text-red-900 transition-colors" />
-              </div>
-
-              <div className="flex gap-4 mb-4 pb-4 border-b border-zinc-800/50 text-xs font-mono text-zinc-400">
-                {Object.entries(op.stats).map(([k, v]) => (
-                  <div key={k}>
-                    <span className="uppercase text-zinc-600 block">{k}</span>
-                    <span className="text-zinc-300">{v}</span>
-                  </div>
-                ))}
-              </div>
-
-              <p className="text-sm text-zinc-400 leading-relaxed mb-4 flex-1">
-                {op.desc}
-              </p>
-
-              <blockquote className="border-l-2 border-red-900 pl-3 py-1 bg-zinc-950/50 text-zinc-500 text-sm italic">
-                "{op.quote}"
-              </blockquote>
+                
+                <div class="w-full md:w-1/2 font-rajdhani tracking-widest reveal delay-200">
+                    <ul class="space-y-6">
+                        <li class="flex items-start gap-4">
+                            <span class="text-red-700 mt-1">◈</span>
+                            <div>
+                                <h4 class="text-gray-200 font-bold uppercase text-lg">Origin</h4>
+                                <p class="text-gray-500 text-sm mt-1">GRU Directorate S (Unacknowledged)</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <span class="text-red-700 mt-1">◈</span>
+                            <div>
+                                <h4 class="text-gray-200 font-bold uppercase text-lg">Active Status</h4>
+                                <p class="text-gray-500 text-sm mt-1">Operational — Black Seal Clearance</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <span class="text-red-700 mt-1">◈</span>
+                            <div>
+                                <h4 class="text-gray-200 font-bold uppercase text-lg">Command Protocol</h4>
+                                <p class="text-gray-500 text-sm mt-1">No reporting requirements. Total Autonomy.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function OperationsSection() {
-  return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="border-b border-zinc-800 pb-4 mb-8 flex justify-between items-end">
-        <div>
-          <h2 className="text-3xl font-black text-zinc-100 uppercase tracking-tight flex items-center gap-3">
-            <Map className="text-red-500" size={32} />
-            Active Intel
-          </h2>
-          <p className="text-zinc-500 font-mono mt-2">Current Deployments and Target Parameters</p>
         </div>
-        <div className="text-right hidden sm:block">
-          <span className="inline-block px-2 py-1 bg-red-900/20 text-red-500 text-xs font-mono font-bold border border-red-900/50">
-            ENCRYPTION: ACTIVE
-          </span>
-        </div>
-      </div>
+    </section>
 
-      <div className="bg-zinc-900 border border-zinc-800 p-6 md:p-8 relative overflow-hidden">
-        {/* Background Graphic */}
-        <div className="absolute -right-20 -bottom-20 opacity-5 pointer-events-none">
-          <Crosshair size={400} />
-        </div>
+    <!-- OPERATIVES ROSTER -->
+    <section id="roster" class="py-24 px-6 md:px-12 relative z-10 bg-black/40">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-16 text-center reveal">
+                <h3 class="font-rajdhani text-red-700 tracking-[0.3em] text-sm font-bold uppercase mb-2">Internal File</h3>
+                <h2 class="font-gothic text-4xl md:text-5xl text-white">Active <span class="text-gray-500">Operatives</span></h2>
+                <div class="h-[1px] w-24 bg-red-900 mx-auto mt-6"></div>
+            </div>
 
-        <div className="relative z-10 max-w-4xl">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="h-3 w-3 bg-red-500 animate-pulse rounded-full shadow-[0_0_10px_rgba(239,68,68,0.7)]"></div>
-            <h3 className="text-2xl font-black text-zinc-100 uppercase tracking-widest">
-              OPERATION: SLED-GLASS
-            </h3>
-          </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- ROLAN VARKOFF -->
+                <div class="glass-card p-6 flex flex-col h-full reveal">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-red-600 font-bold tracking-widest text-xs">CMD-01</span>
+                        <span class="text-gray-600 text-xs uppercase tracking-widest">Alfa-S.O.D.</span>
+                    </div>
+                    <h3 class="font-gothic text-2xl text-white mb-1">Rolan Varkoff</h3>
+                    <h4 class="font-rajdhani text-red-500 uppercase tracking-widest text-sm mb-4 border-b border-gray-800 pb-2">Colonel / Commander</h4>
+                    <p class="text-gray-400 text-sm flex-grow mb-4 leading-relaxed">
+                        Stands 7'0". Reconstructive surgical scars (horizontal above eyelids) mark a history of unmanaged trauma turned to brutal efficiency. Commands with absolute, unflinching judgment. Often operates masked to conceal facial asymmetry. 
+                    </p>
+                    <div class="font-rajdhani text-xs text-gray-500 tracking-widest bg-black/50 p-2 border border-gray-800/50">
+                        "If violence is required, he will provide it."
+                    </div>
+                </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div className="space-y-4 md:col-span-2">
-              <div className="bg-black/40 p-4 border-l-4 border-red-800">
-                <h4 className="text-zinc-500 text-xs font-mono uppercase mb-2">Primary Target</h4>
-                <p className="text-xl font-bold text-zinc-200">VIPER 6 Leadership</p>
-                <p className="text-zinc-400 text-sm mt-2">
-                  Objective: Track, isolate, and eliminate VIPER 6 leadership. Disrupt operations without attribution. 
-                  <Redacted> Leave no living source of information.</Redacted>
+                <!-- LEV SVYATOSLAV -->
+                <div class="glass-card p-6 flex flex-col h-full reveal delay-100">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-red-600 font-bold tracking-widest text-xs">REC-02</span>
+                        <span class="text-gray-600 text-xs uppercase tracking-widest">Alfa-S.O.D.</span>
+                    </div>
+                    <h3 class="font-gothic text-2xl text-white mb-1">Lev Svyatoslav</h3>
+                    <h4 class="font-rajdhani text-red-500 uppercase tracking-widest text-sm mb-4 border-b border-gray-800 pb-2">Colonel / Recon</h4>
+                    <p class="text-gray-400 text-sm flex-grow mb-4 leading-relaxed">
+                        Long-range surveillance and reconnaissance expert. A rising Spetsnaz officer alongside Varkoff during the unit's infancy. Calculating, cold, and a foundational pillar of RASKOL 17's tactical oversight.
+                    </p>
+                    <div class="font-rajdhani text-xs text-gray-500 tracking-widest bg-black/50 p-2 border border-gray-800/50">
+                        STATUS: DEPLOYED - DEEP ZONE
+                    </div>
+                </div>
+
+                <!-- DIMITRI RUSTOV -->
+                <div class="glass-card p-6 flex flex-col h-full reveal delay-200">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-red-600 font-bold tracking-widest text-xs">CQC-03</span>
+                        <span class="text-gray-600 text-xs uppercase tracking-widest">Alfa-S.O.D.</span>
+                    </div>
+                    <h3 class="font-gothic text-2xl text-white mb-1">Dimitri Rustov</h3>
+                    <h4 class="font-rajdhani text-red-500 uppercase tracking-widest text-sm mb-4 border-b border-gray-800 pb-2">Senior Lieutenant / Psy-Ops</h4>
+                    <p class="text-gray-400 text-sm flex-grow mb-4 leading-relaxed">
+                        Unpredictable CQC fighter. Uses a sanguine, volatile humor as an emotional shield and misdirection. Beneath the brash exterior is a natural leader and Varkoff's meticulously crafted shadow. Avoids responsibility, takes control on instinct.
+                    </p>
+                    <div class="font-rajdhani text-xs text-gray-500 tracking-widest bg-black/50 p-2 border border-gray-800/50">
+                        TRAIT: EMOTIONALLY EVASIVE
+                    </div>
+                </div>
+
+                <!-- KONSTANTIN YEGOROV -->
+                <div class="glass-card p-6 flex flex-col h-full reveal">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-red-600 font-bold tracking-widest text-xs">SNP-04</span>
+                        <span class="text-gray-600 text-xs uppercase tracking-widest">Alfa-S.O.D.</span>
+                    </div>
+                    <h3 class="font-gothic text-2xl text-white mb-1">Konstantin "Kostya" Yegorov</h3>
+                    <h4 class="font-rajdhani text-red-500 uppercase tracking-widest text-sm mb-4 border-b border-gray-800 pb-2">Captain / Sniper</h4>
+                    <p class="text-gray-400 text-sm flex-grow mb-4 leading-relaxed">
+                        Psychological warfare mastermind. Cerebral, provocative, and highly manipulative. Arrested by Varkoff at 17 and offered a choice: prison or lethal molding. Uses deception, radio jammers, and taunts to break enemy morale.
+                    </p>
+                    <div class="font-rajdhani text-xs text-gray-500 tracking-widest bg-black/50 p-2 border border-gray-800/50">
+                        "He doesn't just observe—he investigates."
+                    </div>
+                </div>
+
+                <!-- IVAN SHEVCHENKO -->
+                <div class="glass-card p-6 flex flex-col h-full reveal delay-100">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-red-600 font-bold tracking-widest text-xs">DEM-05</span>
+                        <span class="text-gray-600 text-xs uppercase tracking-widest">Alfa-S.O.D.</span>
+                    </div>
+                    <h3 class="font-gothic text-2xl text-white mb-1">Ivan Shevchenko</h3>
+                    <h4 class="font-rajdhani text-red-500 uppercase tracking-widest text-sm mb-4 border-b border-gray-800 pb-2">Sergeant / Field Lead</h4>
+                    <p class="text-gray-400 text-sm flex-grow mb-4 leading-relaxed">
+                        Specialist in close quarters combat and demolitions. Ground-level enforcer ensuring mission parameters are physically met. Brutal, efficient, necessary.
+                    </p>
+                    <div class="font-rajdhani text-xs text-gray-500 tracking-widest bg-black/50 p-2 border border-gray-800/50">
+                        STATUS: ACTIVE
+                    </div>
+                </div>
+
+                <!-- VALENTIN REZNIKOV -->
+                <div class="glass-card p-6 flex flex-col h-full reveal delay-200">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-red-600 font-bold tracking-widest text-xs">OPR-06</span>
+                        <span class="text-gray-600 text-xs uppercase tracking-widest">Alfa-S.O.D.</span>
+                    </div>
+                    <h3 class="font-gothic text-2xl text-white mb-1">Valentin Reznikov</h3>
+                    <h4 class="font-rajdhani text-red-500 uppercase tracking-widest text-sm mb-4 border-b border-gray-800 pb-2">Operative</h4>
+                    <p class="text-gray-400 text-sm flex-grow mb-4 leading-relaxed">
+                        Former struggling addict and classmate to Konstantin. Now swept into the black-ops architecture of RASKOL 17. His past is a liability; his presence is an asset.
+                    </p>
+                    <div class="font-rajdhani text-xs text-gray-500 tracking-widest bg-black/50 p-2 border border-gray-800/50">
+                        STATUS: ACTIVE
+                    </div>
+                </div>
+            </div>
+
+            <!-- CIVILIAN ATTACHMENT -->
+            <div class="mt-12 max-w-2xl mx-auto glass-card p-6 border-l-4 border-l-yellow-600 reveal">
+                <div class="flex items-center gap-4 mb-2">
+                    <span class="text-yellow-600 font-bold text-lg">⚠</span>
+                    <h3 class="font-gothic text-xl text-gray-200">Leonid Svyatoslav</h3>
+                </div>
+                <h4 class="font-rajdhani text-yellow-600 uppercase tracking-widest text-xs mb-3 border-b border-gray-800 pb-2">Civilian Profile / Non-Combatant</h4>
+                <p class="text-gray-400 text-sm">
+                    Son of Colonel Lev Svyatoslav. No military affiliation. Maintained in the database strictly as a high-value collateral risk. Directive: DO NOT ENGAGE.
                 </p>
-              </div>
-
-              <div className="space-y-2 mt-6">
-                <h4 className="text-zinc-500 text-xs font-mono uppercase">Confirmed R17 Activities (Attributed to Accidents)</h4>
-                <ul className="list-disc pl-5 text-sm text-zinc-400 space-y-1">
-                  <li>Five assassinations of compromised Russian state figures.</li>
-                  <li>Armed destabilization of Federation-friendly regions.</li>
-                  <li>Coordinated sabotage of military logistics in the Caucasus.</li>
-                </ul>
-              </div>
             </div>
-
-            <div className="bg-zinc-950 p-4 border border-zinc-800 text-sm font-mono space-y-4">
-              <div>
-                <span className="text-zinc-600 block mb-1">LOCATION:</span>
-                <span className="text-zinc-300">Berlin, Germany</span>
-              </div>
-              <div>
-                <span className="text-zinc-600 block mb-1">COVER:</span>
-                <span className="text-zinc-300">Civilian Tourist Cell</span>
-              </div>
-              <div>
-                <span className="text-zinc-600 block mb-1">LOCAL TARGET:</span>
-                <span className="text-zinc-300">Criminal Syndicate</span>
-              </div>
-              <div className="pt-4 border-t border-zinc-800">
-                <span className="text-yellow-600/70 block mb-1 text-xs">// FIELD NOTES</span>
-                <span className="text-zinc-500 text-xs italic">
-                  Team is utilizing a steep cliffside rental property for surveillance. Heavy emphasis on civilian blending (lake activities). Do not blow cover.
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-      
-      {/* Easter Egg / Cosmic Lore Note */}
-      <div className="mt-12 p-4 border border-zinc-800 bg-zinc-900/30">
-        <h4 className="text-xs font-mono text-zinc-600 uppercase mb-2 flex items-center gap-2">
-          <FileText size={14} /> DEEP ARCHIVE: COSMIC ANOMALIES [RESTRICTED]
-        </h4>
-        <p className="text-xs text-zinc-500 font-mono">
-          Logs dictate abnormal phenomena existing within the operational universe. Reports of immortal entities—colloquially designated "Vampires"—exist in deep state archives. They do not turn humans. They are bound by karmic consequence and purportedly cursed by a higher power. <Redacted>Directive strictly forbids engagement.</Redacted>
+    </section>
+
+    <!-- ADVERSARIES / VIPER 6 -->
+    <section id="viper" class="py-24 px-6 md:px-12 relative z-10 border-t border-red-900/30">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col lg:flex-row gap-12 items-center">
+                <div class="w-full lg:w-1/3 reveal">
+                    <h3 class="font-rajdhani text-red-700 tracking-[0.3em] text-sm font-bold uppercase mb-2">Threat Level: OMEGA</h3>
+                    <h2 class="font-gothic text-5xl text-white mb-4">VIPER <span class="text-gray-600">6</span></h2>
+                    <h4 class="font-rajdhani text-gray-300 uppercase tracking-widest text-sm mb-6 pb-4 border-b border-gray-800">Operation: SLED-GLASS</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                        A ruthless German mafia and mercenary faction rooted in Dresden. They execute assassinations, sabotage logistics, and destabilize Federation-friendly regions across Europe. 
+                    </p>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                        Signature: Leaving a black card embossed with a viper coiled around six bullet holes at the scene of every major operation.
+                    </p>
+                    <p class="text-red-500 font-bold text-sm tracking-widest uppercase">
+                        Mission: Track, isolate, eliminate. Leave no living source of information.
+                    </p>
+                </div>
+                
+                <div class="w-full lg:w-2/3 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- KAISER BRANDT -->
+                    <div class="glass-card p-5 border-l-2 border-l-red-800 reveal delay-100">
+                        <h4 class="font-gothic text-xl text-white mb-1">Kaiser Brandt</h4>
+                        <p class="font-rajdhani text-red-600 text-xs uppercase tracking-widest mb-3">Faction Leader</p>
+                        <p class="text-gray-500 text-sm">The architect behind VIPER 6. Calculates global string-pulling from the shadows of Berlin and Dresden.</p>
+                    </div>
+                    
+                    <!-- MARCEL BRANDT -->
+                    <div class="glass-card p-5 border-l-2 border-l-red-800 reveal delay-200">
+                        <h4 class="font-gothic text-xl text-white mb-1">Marcel Brandt</h4>
+                        <p class="font-rajdhani text-red-600 text-xs uppercase tracking-widest mb-3">High Command</p>
+                        <p class="text-gray-500 text-sm">Core family leadership. Manages the illicit flow of weapons and coordinated ambushes against Russian high-profiles.</p>
+                    </div>
+
+                    <!-- KLAUS JÄGER -->
+                    <div class="glass-card p-5 border-l-2 border-l-red-800 reveal delay-300">
+                        <h4 class="font-gothic text-xl text-white mb-1">Klaus Jäger</h4>
+                        <p class="font-rajdhani text-red-600 text-xs uppercase tracking-widest mb-3">Enforcer / Operator</p>
+                        <p class="text-gray-500 text-sm">The blunt instrument of VIPER 6. Brutal, uncompromising, handles the violent realities of psychological warfare.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="py-12 text-center border-t border-gray-900 bg-black/80 relative z-10">
+        <div class="font-gothic text-2xl text-gray-700 tracking-[0.2em] mb-4">RASKOL 17</div>
+        <p class="font-rajdhani text-red-900 uppercase tracking-[0.4em] text-xs font-bold">
+            End of File. No return path.
         </p>
-      </div>
+    </footer>
 
-    </div>
-  );
-}
+    <!-- SCRIPTS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Loader Sequence
+            const loader = document.getElementById('loader');
+            const msg2 = document.getElementById('loader-msg-2');
+            
+            // Allow CSS animation to play out, then fade out loader
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    // Trigger scroll reveals initially in view
+                    triggerReveals();
+                }, 1200); // Wait for opacity fade
+            }, 3800); // Time for the typing effect and reading
 
+            // Scroll Reveal Logic
+            const reveals = document.querySelectorAll('.reveal');
+            
+            const revealOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
 
+            const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target); // Stop observing once revealed
+                    }
+                });
+            }, revealOptions);
 
+            function triggerReveals() {
+                reveals.forEach(reveal => {
+                    revealOnScroll.observe(reveal);
+                });
+            }
+
+            // Fallback for loader issue
+            window.addEventListener('load', () => {
+               if(loader.style.display !== 'none') {
+                   setTimeout(() => { loader.style.opacity = '0'; }, 3500);
+                   setTimeout(() => { loader.style.display = 'none'; triggerReveals(); }, 4700);
+               }
+            });
+        });
+    </script>
+</body>
+</html>
+
+```
